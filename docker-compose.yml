@@ -39,14 +39,14 @@ services:
       context: .
       args:
         - PORT=${PORT}
-    entrypoint: ["npm", "run", "start:dev"]
+    #entrypoint: ["npm", "run", "start:dev"]
     ports:
       - 5001:${PORT}
       - 9229:9229
     volumes:
       - .:/media-reciever-app
       - node_modules:/media-reciever-app/node_modules/
-    command: npm run start:debug
+    command: npm run start:debug # override entry command
     depends_on:
       - media-reciever-postgres
     links:
