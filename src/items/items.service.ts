@@ -30,7 +30,7 @@ export class ItemsService {
   };
 
   findAll(): Items {
-    console.log('eee');
+    console.log('oyee, quepaso');
     return this.items;
   }
 
