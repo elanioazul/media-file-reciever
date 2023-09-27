@@ -1,32 +1,59 @@
 version: "3.8"
-
 services:
+  media-reciever-postgres:
+    image: postgres:latest
+    container_name: media-reciever-postgres
+    restart: always
+    env_file: .env
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    ports:
+      - 5433:${DATABASE_PORT}
+    volumes:
+      - docker-nest-postgres:/var/lib/postgresql/data
+    # networks:
+    #   - nesjs-network
   media-reciever-production:
-    container_name: media-reciever-production
+    container_name: media-reciever-api-production
     build:
       target: production
       context: .
       args:
         - PORT=${PORT}
     ports:
-      - "${PORT}:${PORT}"
-
+      - 5001:${PORT}
   media-reciever-dev:
-    container_name: media-reciever-dev
+    container_name: media-reciever-api-dev
     restart: unless-stopped
     env_file: .env
+    environment:
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_HOST: media-reciever-postgres
+      DATABASE_PORT: ${DATABASE_PORT}
     build:
       target: dev
       context: .
       args:
         - PORT=${PORT}
+    #entrypoint: ["npm", "run", "start:dev"]
     ports:
-      - "${PORT}:${PORT}"
-      - "9229:9229"
+      - 5001:${PORT}
+      - 9229:9229
     volumes:
       - .:/media-reciever-app
       - node_modules:/media-reciever-app/node_modules/
     command: npm run start:debug # override entry command
-
+    depends_on:
+      - media-reciever-postgres
+    links:
+      - media-reciever-postgres
 volumes:
-  node_modules:
+  node_modules: null
+  docker-nest-postgres: null
+# networks:
+#   nesjs-network:
+#     name: nesjs-network
