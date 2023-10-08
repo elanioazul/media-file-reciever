@@ -6,12 +6,16 @@ import {
   UploadedFiles,
   UploadedFile,
   Req,
+  Get,
+  Query,
+  Param,
+  Res,
 } from '@nestjs/common';
-import { Express } from 'express';
+import { Express, Response } from 'express';
 import { FileManagementService } from './file-management.service';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { Multer, diskStorage, DiskStorageOptions } from 'multer';
-import { extname } from 'path';
+import * as path from 'path';
 
 const storage = diskStorage({
   destination: './uploads',
@@ -48,7 +52,19 @@ export class FileManagementController {
   //   return await this.appService.getUrls(req);
   // }
 
-  @Post('upload')
+  @Get('file/:id')
+  async find(@Res() res: Response, @Param('id') id: string): Promise<any> {
+    const dirname = path.resolve();
+    if (!dirname) {
+      return res
+        .status(500)
+        .send('Unable to determine the current working directory.');
+    }
+    const fullfilepath = path.join(dirname, './uploads/' + id);
+    return res.sendFile(fullfilepath);
+  }
+
+  @Post('file')
   @UseInterceptors(
     FileInterceptor(
       'file', // name of the html field being passed
