@@ -8,10 +8,10 @@ import {
   Put,
 } from '@nestjs/common';
 import { ItemsService } from './items.service';
-import { Items } from '../items';
-import { Item } from '../item';
+import { Items } from './items';
+import { Item } from './item';
 
-@Controller('items')
+@Controller('api/items')
 export class ItemsController {
   constructor(private readonly itemsService: ItemsService) {}
 

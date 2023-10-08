@@ -1,5 +1,5 @@
 import { IsString, IsNumber, IsDateString, IsDate } from 'class-validator';
-export class CreateFileDto {
+export class TreeCamFileDto {
   @IsString()
   readonly file_name: string;
 

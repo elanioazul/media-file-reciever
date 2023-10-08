@@ -2,9 +2,7 @@ import { Module } from '@nestjs/common';
 import { ItemsModule } from './items/items.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { PhotographersModule } from './photographers/photographers.module';
-import { FilesModule } from './files/files.module';
-import { CamerasModule } from './cameras/cameras.module';
+import { FileManagementModule } from './modules/file-management/file-management.module';
 //import appConfig from './config/app.config';
 @Module({
   imports: [
@@ -20,9 +18,7 @@ import { CamerasModule } from './cameras/cameras.module';
       synchronize: false,
     }),
     ItemsModule,
-    PhotographersModule,
-    FilesModule,
-    CamerasModule,
+    FileManagementModule,
   ],
   controllers: [],
   providers: [],
