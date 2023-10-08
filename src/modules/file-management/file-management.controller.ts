@@ -51,15 +51,13 @@ export class FileManagementController {
   @Post('upload')
   @UseInterceptors(
     FileInterceptor(
-      'file', // name of the field being passed
+      'file', // name of the html field being passed
       { storage },
     ),
   )
   async upload(@Req() request: Request, @UploadedFile() file: Multer) {
-    console.log(request);
-
     console.log(file);
-    console.log('uploadeddddddddddddddddddd');
+    console.log('uploaded');
 
     return file;
   }
