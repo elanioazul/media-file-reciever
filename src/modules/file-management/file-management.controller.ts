@@ -55,7 +55,10 @@ export class FileManagementController {
       { storage },
     ),
   )
-  async upload(@Req() request: Request, @UploadedFile() file: Multer) {
+  async upload(
+    @Req() request: Request,
+    @UploadedFile() file: Multer['single'],
+  ) {
     console.log(file);
     console.log('uploaded');
 
