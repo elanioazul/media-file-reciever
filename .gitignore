@@ -7,7 +7,7 @@
 .env
 
 # multer initial storage
-.uploads
+/uploads
 
 # Logs
 logs
