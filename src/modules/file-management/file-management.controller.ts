@@ -10,7 +10,7 @@ import {
 import { Express } from 'express';
 import { FileManagementService } from './file-management.service';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { Multer, diskStorage } from 'multer';
+import { Multer, diskStorage, DiskStorageOptions } from 'multer';
 import { extname } from 'path';
 
 const storage = diskStorage({
@@ -21,7 +21,7 @@ const storage = diskStorage({
 });
 
 const generateFilename = (file) => {
-  return `${Date.now()}${extname(file.originalname)}`;
+  return `${Date.now()}` + '-' + `${file.originalname}`;
 };
 
 @Controller('api/files')
