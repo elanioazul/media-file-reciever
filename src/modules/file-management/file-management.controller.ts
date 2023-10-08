@@ -21,7 +21,7 @@ const storage = diskStorage({
 });
 
 const generateFilename = (file) => {
-  return `${Date.now()}.${extname(file.originalname)}`;
+  return `${Date.now()}${extname(file.originalname)}`;
 };
 
 @Controller('api/files')
