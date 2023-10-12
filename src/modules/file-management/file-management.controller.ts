@@ -16,6 +16,7 @@ import { FileManagementService } from './file-management.service';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { Multer, diskStorage, DiskStorageOptions } from 'multer';
 import * as path from 'path';
+import { TreeCamFiletDto } from './dto/treecam-file.dto';
 
 const storage = diskStorage({
   destination: './uploads',
@@ -73,8 +74,11 @@ export class FileManagementController {
   )
   async upload(
     @Req() request: Request,
+    @Body() storageObjDto: TreeCamFiletDto,
     @UploadedFile() file: Multer['single'],
   ) {
+    console.log(request);
+    console.log(storageObjDto);
     console.log(file);
     console.log('uploaded');
 
