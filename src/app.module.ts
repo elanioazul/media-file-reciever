@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { ItemsModule } from './items/items.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { FileManagementModule } from './modules/file-management/file-management.module';
@@ -17,7 +16,6 @@ import { FileManagementModule } from './modules/file-management/file-management.
       autoLoadEntities: true,
       synchronize: false,
     }),
-    ItemsModule,
     FileManagementModule,
   ],
   controllers: [],
