@@ -65,7 +65,7 @@ export class FileManagementController {
     return res.sendFile(fullfilepath);
   }
 
-  @Post('file')
+  @Post('single')
   @UseInterceptors(
     FileInterceptor(
       'file', // name of the html field being passed
@@ -73,11 +73,9 @@ export class FileManagementController {
     ),
   )
   async upload(
-    @Req() request: Request,
     @Body() storageObjDto: TreeCamFiletDto,
     @UploadedFile() file: Multer['single'],
   ) {
-    console.log(request);
     console.log(storageObjDto);
     console.log(file);
     console.log('uploaded');
