@@ -1,5 +1,5 @@
 import { IsString, IsNumber, IsBoolean } from 'class-validator';
-import { camDto } from './cam.dto';
+import { camDto } from './camera.dto';
 
 export class camOwner extends camDto {
   @IsString()

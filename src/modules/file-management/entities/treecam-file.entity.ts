@@ -2,12 +2,14 @@ import { Camera } from 'src/modules/file-management/entities/camera.entity';
 import {
   Column,
   CreateDateColumn,
+  Entity,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-export class File {
+@Entity('treecamfiles')
+export class TreeCamFile {
   @PrimaryGeneratedColumn()
   id: number;
 
