@@ -23,13 +23,13 @@ export class Owner {
   dni: string;
 
   @Column()
-  telegram_account: string;
+  telegram_user: string;
 
   @Column()
   email: string;
 
   @Column()
-  phone: number;
+  phone: string;
 
   @OneToMany(() => Camera, (camera) => camera.owner)
   camera: Camera[];

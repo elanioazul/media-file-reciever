@@ -1,12 +1,15 @@
 import { IsString, IsNumber, IsBoolean } from 'class-validator';
 
-export class camDto {
+export class CameraDto {
   @IsString()
-  brand: string;
+  camAlias: string;
 
   @IsString()
-  model: string;
+  camBrand: string;
 
   @IsString()
-  hasGeoCapabilities: string;
+  camModel: string;
+
+  @IsString()
+  camHasGeoCapabilities: string;
 }

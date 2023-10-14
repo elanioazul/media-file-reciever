@@ -1,22 +1,22 @@
 import { IsString, IsNumber, IsBoolean } from 'class-validator';
-import { camDto } from './camera.dto';
+import { CameraDto } from './camera.dto';
 
-export class camOwner extends camDto {
+export class OwnerDto extends CameraDto {
   @IsString()
-  name: string;
-
-  @IsString()
-  surname: string;
+  ownerName: string;
 
   @IsString()
-  dni: string;
+  ownerSurname: string;
 
   @IsString()
-  telegramUser: string;
+  ownerDni: string;
 
   @IsString()
-  phone: string;
+  ownerTelegramUser: string;
 
   @IsString()
-  email: string;
+  ownerPhone: string;
+
+  @IsString()
+  ownerEmail: string;
 }

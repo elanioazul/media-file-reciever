@@ -1,4 +1,11 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { TreeCamFile } from 'src/modules/file-management/entities/treecam-file.entity';
 import { Owner } from './owner.entity';
 
@@ -8,16 +15,19 @@ export class Camera {
   id: number;
 
   @Column()
+  alias: string;
+
+  @Column()
   brand: string;
 
   @Column()
   model: string;
 
   @Column()
-  hasLocationFeat: boolean;
+  hasLocationFeat: string;
 
   @OneToMany(() => TreeCamFile, (file) => file.camera)
-  photos: TreeCamFile[];
+  files: TreeCamFile[];
 
   @ManyToOne(() => Owner, (owner) => owner.camera, {
     cascade: ['insert'],

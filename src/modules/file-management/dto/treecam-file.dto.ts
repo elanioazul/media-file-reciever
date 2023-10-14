@@ -1,6 +1,7 @@
 import { Multer } from 'multer';
-import { camOwner } from './owner.dto';
+import { IsString } from 'class-validator';
+import { OwnerDto } from './owner.dto';
 
-export class TreeCamFiletDto extends camOwner {
+export class TreeCamFiletDto extends OwnerDto {
   file: Multer['single'];
 }

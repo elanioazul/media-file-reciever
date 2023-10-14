@@ -28,7 +28,7 @@ export class TreeCamFile {
   @Column()
   size: number;
 
-  @ManyToOne(() => Camera, (camera) => camera.photos, {
+  @ManyToOne(() => Camera, (camera) => camera.files, {
     cascade: ['insert'],
   })
   @JoinColumn({ name: 'camera_id' })
