@@ -29,7 +29,7 @@ export class Camera {
   @OneToMany(() => TreeCamFile, (file) => file.camera)
   files: TreeCamFile[];
 
-  @ManyToOne(() => Owner, (owner) => owner.camera, {
+  @ManyToOne(() => Owner, (owner) => owner.cameras, {
     cascade: ['insert'],
   })
   @JoinColumn({ name: 'owner_id' })

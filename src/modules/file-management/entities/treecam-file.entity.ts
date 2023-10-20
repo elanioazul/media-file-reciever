@@ -20,7 +20,7 @@ export class TreeCamFile {
   filename: string;
 
   @Column()
-  filepath: string;
+  path: string;
 
   @Column()
   mimetype: string;
@@ -34,24 +34,9 @@ export class TreeCamFile {
   @JoinColumn({ name: 'camera_id' })
   camera: Camera;
 
-  @CreateDateColumn({ name: 'created_at' })
-  createdDate: Date;
-
   @CreateDateColumn({
-    name: 'created_at_detailed1',
+    name: 'created_at',
     type: 'timestamp with time zone',
   })
   createdTimeStampWithTimeZone: Date;
-
-  @CreateDateColumn({
-    name: 'created_at_detailed2',
-    type: 'timestamp without time zone',
-  })
-  createdTimeStampWithNoTimeZone: Date;
-
-  @CreateDateColumn({
-    name: 'created_at_detailed3',
-    type: 'timestamp',
-  })
-  createdTimeStamp: Date;
 }

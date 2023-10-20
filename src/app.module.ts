@@ -14,7 +14,7 @@ import { FileManagementModule } from './modules/file-management/file-management.
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
       autoLoadEntities: true,
-      synchronize: false,
+      synchronize: true,
     }),
     FileManagementModule,
   ],

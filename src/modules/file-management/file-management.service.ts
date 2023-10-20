@@ -6,15 +6,16 @@ import { Owner } from './entities/owner.entity';
 import { Repository } from 'typeorm';
 import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 import { TreeCamFiletDto } from './dto/treecam-file.dto';
+import { Multer } from 'multer';
 
 @Injectable()
 export class FileManagementService {
   constructor(
     @InjectRepository(TreeCamFile)
     private readonly treeCamFileRepository: Repository<TreeCamFile>,
-    @InjectRepository(TreeCamFile)
+    @InjectRepository(Camera)
     private readonly cameraRepository: Repository<Camera>,
-    @InjectRepository(TreeCamFile)
+    @InjectRepository(Owner)
     private readonly ownersRepository: Repository<Owner>,
   ) {}
 
@@ -41,18 +42,28 @@ export class FileManagementService {
     return file;
   }
 
-  async create(treeCamFiletDto: TreeCamFiletDto) {
-    const camera = await this.preloadCamera(treeCamFiletDto);
+  async create(treeCamFiletDto: TreeCamFiletDto, multerFile: Multer['single']) {
+    const {
+      originalname,
+      encoding,
+      mimetype,
+      destination,
+      filename,
+      path,
+      size,
+    } = multerFile;
+
     const owner = await this.preloadOwner(treeCamFiletDto);
+    const camera = await this.preloadCamera(treeCamFiletDto, owner);
+
     const file = this.treeCamFileRepository.create({
-      ...treeCamFiletDto,
+      originalname,
+      filename,
+      path,
+      mimetype,
+      size,
       camera,
     });
-    const newCamRegistry = this.cameraRepository.create({
-      ...treeCamFiletDto,
-      owner,
-    });
-    this.cameraRepository.save(newCamRegistry);
     return this.treeCamFileRepository.save(file);
   }
 
@@ -63,42 +74,93 @@ export class FileManagementService {
 
   private async preloadCamera(
     treeCamFiletDto: TreeCamFiletDto,
+    owner: Owner,
   ): Promise<Camera> {
-    const existingCamera = await this.cameraRepository.findOne({
+    const existingCam = await this.cameraRepository.findOne({
       where: { alias: treeCamFiletDto.camAlias },
     });
-    if (existingCamera) {
-      return existingCamera;
-    }
-    return this.cameraRepository.create({
-      alias: treeCamFiletDto.camAlias,
-      brand: treeCamFiletDto.camBrand,
-      model: treeCamFiletDto.camModel,
-      hasLocationFeat: treeCamFiletDto.camHasGeoCapabilities,
-    });
-  }
 
-  private isARegisteredOwer(treeCamFiletDto: TreeCamFiletDto): boolean {
-    const existingOwner = this.ownersRepository.findOne({
-      where: { dni: treeCamFiletDto.ownerDni },
-    });
-    return existingOwner ? true : false;
+    if (existingCam) {
+      return existingCam;
+    }
+
+    try {
+      const newCam = this.cameraRepository.create({
+        alias: treeCamFiletDto.camAlias,
+        brand: treeCamFiletDto.camBrand,
+        model: treeCamFiletDto.camModel,
+        hasLocationFeat: treeCamFiletDto.camHasGeoCapabilities,
+        owner,
+      });
+      await this.cameraRepository.save(newCam);
+      return newCam;
+    } catch (error) {
+      throw error;
+    }
   }
 
   private async preloadOwner(treeCamFiletDto: TreeCamFiletDto): Promise<Owner> {
     const existingOwner = await this.ownersRepository.findOne({
       where: { dni: treeCamFiletDto.ownerDni },
     });
+
     if (existingOwner) {
       return existingOwner;
     }
-    return this.ownersRepository.create({
-      name: treeCamFiletDto.ownerName,
-      surname: treeCamFiletDto.ownerSurname,
-      dni: treeCamFiletDto.ownerDni,
-      telegram_user: treeCamFiletDto.ownerTelegramUser,
-      email: treeCamFiletDto.ownerEmail,
-      phone: treeCamFiletDto.ownerPhone,
-    });
+
+    try {
+      const newOwner = this.ownersRepository.create({
+        name: treeCamFiletDto.ownerName,
+        surname: treeCamFiletDto.ownerSurname,
+        dni: treeCamFiletDto.ownerDni,
+        telegram_user: treeCamFiletDto.ownerTelegramUser,
+        email: treeCamFiletDto.ownerEmail,
+        phone: treeCamFiletDto.ownerPhone,
+      });
+      await this.ownersRepository.save(newOwner);
+      return newOwner;
+    } catch (error) {
+      throw error;
+    }
   }
+
+  // private async preloadCamera(
+  //   treeCamFiletDto: TreeCamFiletDto,
+  //   owner: Owner,
+  // ): Promise<Camera> {
+  //   const existingCam = await this.cameraRepository.findOne({
+  //     where: { alias: treeCamFiletDto.camAlias },
+  //   });
+  //   if (existingCam) {
+  //     return existingCam;
+  //   }
+  //   const newCam = this.cameraRepository.create({
+  //     alias: treeCamFiletDto.camAlias,
+  //     brand: treeCamFiletDto.camBrand,
+  //     model: treeCamFiletDto.camModel,
+  //     hasLocationFeat: treeCamFiletDto.camHasGeoCapabilities,
+  //     owner,
+  //   });
+  //   this.cameraRepository.save(newCam);
+  //   return newCam;
+  // }
+
+  // private async preloadOwner(treeCamFiletDto: TreeCamFiletDto): Promise<Owner> {
+  //   const existingOwner = await this.ownersRepository.findOne({
+  //     where: { dni: treeCamFiletDto.ownerDni },
+  //   });
+  //   if (existingOwner) {
+  //     return existingOwner;
+  //   }
+  //   const newOwner = this.ownersRepository.create({
+  //     name: treeCamFiletDto.ownerName,
+  //     surname: treeCamFiletDto.ownerSurname,
+  //     dni: treeCamFiletDto.ownerDni,
+  //     telegram_user: treeCamFiletDto.ownerTelegramUser,
+  //     email: treeCamFiletDto.ownerEmail,
+  //     phone: treeCamFiletDto.ownerPhone,
+  //   });
+  //   this.ownersRepository.save(newOwner);
+  //   return newOwner;
+  // }
 }

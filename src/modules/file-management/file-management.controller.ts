@@ -76,10 +76,6 @@ export class FileManagementController {
     @Body() storageObjDto: TreeCamFiletDto,
     @UploadedFile() file: Multer['single'],
   ) {
-    console.log(storageObjDto);
-    console.log(file);
-    console.log('uploaded');
-
-    return file;
+    this.fileManagementService.create(storageObjDto, file);
   }
 }

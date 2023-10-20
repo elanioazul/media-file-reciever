@@ -32,5 +32,5 @@ export class Owner {
   phone: string;
 
   @OneToMany(() => Camera, (camera) => camera.owner)
-  camera: Camera[];
+  cameras: Camera[];
 }
