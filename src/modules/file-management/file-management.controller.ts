@@ -17,6 +17,7 @@ import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { Multer, diskStorage, DiskStorageOptions } from 'multer';
 import * as path from 'path';
 import { TreeCamFiletDto } from './dto/treecam-file.dto';
+import { CreateTreeCamFileResponse } from './classes/creation-response';
 
 const storage = diskStorage({
   destination: './uploads',
@@ -76,6 +77,14 @@ export class FileManagementController {
     @Body() storageObjDto: TreeCamFiletDto,
     @UploadedFile() file: Multer['single'],
   ) {
-    this.fileManagementService.create(storageObjDto, file);
+    const createdTreecamFile = await this.fileManagementService.create(
+      storageObjDto,
+      file,
+    );
+
+    return new CreateTreeCamFileResponse(
+      'TreeCamFile created successfully',
+      createdTreecamFile,
+    );
   }
 }
