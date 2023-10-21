@@ -6,7 +6,7 @@
 .idea
 .env
 
-./uploads
+/uploads
 # Logs
 logs
 *.log
