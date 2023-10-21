@@ -30,16 +30,16 @@ export class FileManagementService {
     });
   }
   async findOne(id: string) {
-    const file = this.treeCamFileRepository.find({
-      where: { id: +id },
+    const files = await this.treeCamFileRepository.find({
+      where: { filename: id },
       relations: {
         camera: true,
       },
     });
-    if (!file) {
+    if (!files || files.length === 0) {
       throw new NotFoundException(`TeeCamFile ${id} is not found in db`);
     }
-    return file;
+    return files[0];
   }
 
   async create(treeCamFiletDto: TreeCamFiletDto, multerFile: Multer['single']) {

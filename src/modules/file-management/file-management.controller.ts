@@ -62,8 +62,13 @@ export class FileManagementController {
         .status(500)
         .send('Unable to determine the current working directory.');
     }
-    const fullfilepath = path.join(dirname, './uploads/' + id);
-    return res.sendFile(fullfilepath);
+    try {
+      const found = await this.fileManagementService.findOne(id);
+      const physicalFilePath = path.join(dirname, '/' + found.path);
+      res.sendFile(physicalFilePath);
+    } catch (error) {
+      res.status(404).send('File not found');
+    }
   }
 
   @Post('single')
