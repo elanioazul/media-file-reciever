@@ -124,43 +124,4 @@ export class FileManagementService {
     }
   }
 
-  // private async preloadCamera(
-  //   treeCamFiletDto: TreeCamFiletDto,
-  //   owner: Owner,
-  // ): Promise<Camera> {
-  //   const existingCam = await this.cameraRepository.findOne({
-  //     where: { alias: treeCamFiletDto.camAlias },
-  //   });
-  //   if (existingCam) {
-  //     return existingCam;
-  //   }
-  //   const newCam = this.cameraRepository.create({
-  //     alias: treeCamFiletDto.camAlias,
-  //     brand: treeCamFiletDto.camBrand,
-  //     model: treeCamFiletDto.camModel,
-  //     hasLocationFeat: treeCamFiletDto.camHasGeoCapabilities,
-  //     owner,
-  //   });
-  //   this.cameraRepository.save(newCam);
-  //   return newCam;
-  // }
-
-  // private async preloadOwner(treeCamFiletDto: TreeCamFiletDto): Promise<Owner> {
-  //   const existingOwner = await this.ownersRepository.findOne({
-  //     where: { dni: treeCamFiletDto.ownerDni },
-  //   });
-  //   if (existingOwner) {
-  //     return existingOwner;
-  //   }
-  //   const newOwner = this.ownersRepository.create({
-  //     name: treeCamFiletDto.ownerName,
-  //     surname: treeCamFiletDto.ownerSurname,
-  //     dni: treeCamFiletDto.ownerDni,
-  //     telegram_user: treeCamFiletDto.ownerTelegramUser,
-  //     email: treeCamFiletDto.ownerEmail,
-  //     phone: treeCamFiletDto.ownerPhone,
-  //   });
-  //   this.ownersRepository.save(newOwner);
-  //   return newOwner;
-  // }
 }
