@@ -3,33 +3,19 @@ import {
   Post,
   Body,
   UseInterceptors,
-  UploadedFiles,
   UploadedFile,
   Req,
   Get,
-  Query,
   Param,
   Res,
 } from '@nestjs/common';
-import { Express, Response } from 'express';
+import { Response, Request } from 'express';
 import { FileManagementService } from './file-management.service';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { Multer, diskStorage, DiskStorageOptions } from 'multer';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Multer, diskStorage } from 'multer';
 import * as path from 'path';
 import { TreeCamFiletDto } from './dto/treecam-file.dto';
 import { CreateTreeCamFileResponse } from './classes/creation-response';
-
-const storage = diskStorage({
-  destination: './uploads',
-  filename: (req, file, callback) => {
-    callback(null, generateFilename(file));
-  },
-});
-
-const generateFilename = (file) => {
-  return `${Date.now()}` + '-' + `${file.originalname}`;
-};
-
 @Controller('api/files')
 export class FileManagementController {
   constructor(private readonly fileManagementService: FileManagementService) {}
@@ -66,6 +52,7 @@ export class FileManagementController {
       const found = await this.fileManagementService.findOne(id);
       const physicalFilePath = path.join(dirname, '/' + found.path);
       res.sendFile(physicalFilePath);
+      res.contentType(found.mimetype);
     } catch (error) {
       res.status(404).send('File not found');
     }
@@ -73,13 +60,49 @@ export class FileManagementController {
 
   @Post('single')
   @UseInterceptors(
-    FileInterceptor(
-      'file', // name of the html field being passed
-      { storage },
-    ),
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req: Request, file, callback) => {
+          const generateCustomFilename = (
+            file,
+            ownerName,
+            ownerSurname,
+            camAlias,
+          ) => {
+            const getFirstChar = (word: string): string => {
+              return word.substring(0, 1).toUpperCase();
+            };
+            const filenameWithoutExtension = file.originalname
+              .split('.')
+              .slice(0, -1)
+              .join('.');
+            return (
+              `${Date.now()}` +
+              '-' +
+              getFirstChar(ownerName) +
+              getFirstChar(ownerSurname) +
+              '-' +
+              camAlias +
+              '-' +
+              `${filenameWithoutExtension}`
+            );
+          };
+          const storageObj: TreeCamFiletDto = req.body as TreeCamFiletDto;
+          const customFileName = generateCustomFilename(
+            file,
+            storageObj.ownerName,
+            storageObj.ownerSurname,
+            storageObj.camAlias,
+          );
+          callback(null, customFileName);
+        },
+      }),
+    }),
   )
   async upload(
     @Body() storageObjDto: TreeCamFiletDto,
+    @Req() req: Request,
     @UploadedFile() file: Multer['single'],
   ) {
     const createdTreecamFile = await this.fileManagementService.create(
