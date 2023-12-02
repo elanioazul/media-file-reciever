@@ -43,16 +43,16 @@ services:
     ports:
       - 5001:${PORT}
       - 9229:9229
-    volumes:
-      - .:/media-reciever-app
-      - node_modules:/media-reciever-app/node_modules/
+    # volumes:
+    #   - .:/media-reciever-app
+    #   - node_modules:/media-reciever-app/node_modules/
     command: npm run start:debug # override entry command
     depends_on:
       - media-reciever-postgres
     links:
       - media-reciever-postgres
 volumes:
-  node_modules: null
+  #node_modules: null
   docker-nest-postgres: null
 # networks:
 #   nesjs-network:
