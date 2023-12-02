@@ -103,7 +103,7 @@ export class FileManagementController {
   async upload(
     @Body() storageObjDto: TreeCamFiletDto,
     @Req() req: Request,
-    @UploadedFile() file: Multer['single'],
+    @UploadedFile() file: Express.Multer.File,
   ) {
     const createdTreecamFile = await this.fileManagementService.create(
       storageObjDto,

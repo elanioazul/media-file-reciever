@@ -42,7 +42,10 @@ export class FileManagementService {
     return files[0];
   }
 
-  async create(treeCamFiletDto: TreeCamFiletDto, multerFile: Multer['single']) {
+  async create(
+    treeCamFiletDto: TreeCamFiletDto,
+    multerFile: Express.Multer.File,
+  ) {
     const {
       originalname,
       encoding,
