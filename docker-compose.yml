@@ -44,7 +44,7 @@ services:
       - 5001:${PORT}
       - 9229:9229
     volumes:
-    #   - .:/media-reciever-app
+      - .:/media-reciever-app
     #   - node_modules:/media-reciever-app/node_modules/
       - uploaded-files-vol:/media-reciever-app/uploads
     command: npm run start:debug # override entry command
