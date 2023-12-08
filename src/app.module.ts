@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { FileManagementModule } from './modules/file-management/file-management.module';
+import { ProvidersModule } from './modules/providers/providers.module';
+import { BotManagementModule } from './modules/bot-management/bot-management.module';
 //import appConfig from './config/app.config';
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { FileManagementModule } from './modules/file-management/file-management.
       synchronize: true,
     }),
     FileManagementModule,
+    ProvidersModule,
+    BotManagementModule,
   ],
   controllers: [],
   providers: [],
