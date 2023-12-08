@@ -18,11 +18,9 @@ export class AxioshttpService {
     const url = baseUrl + endpoint;
 
     return this.httpService.get(url, { params }).pipe(
-      tap((data) => console.log(data)),
       map((response: any) => response.data),
       catchError((error) => {
         console.error(error);
-        // Forward the error to the subscriber
         return throwError(() => error);
       }),
     );
