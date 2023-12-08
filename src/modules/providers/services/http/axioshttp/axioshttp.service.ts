@@ -1,9 +1,10 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
-import { AxiosRequestConfig } from 'axios';
+import { AxiosHeaders, AxiosRequestConfig, HeadersDefaults } from 'axios';
 import { Observable, catchError, map, tap, throwError } from 'rxjs';
 //import { AxiosResponse } from 'axios';
 //import axios from 'axios';
+import FormData from 'form-data';
 
 @Injectable()
 export class AxioshttpService {
@@ -26,14 +27,21 @@ export class AxioshttpService {
     );
   }
 
-  doNestAxiosPost(body: any, url: string) {
-    try {
-      return this.httpService
-        .post(url, body)
-        .pipe(map((response: any) => response.data));
-    } catch (error) {
-      console.error(error);
-    }
+  doNestAxiosPost(
+    baseUrl: string,
+    endpoint: string,
+    data: FormData,
+    headers: any,
+  ): Observable<any> {
+    const url = baseUrl + endpoint;
+
+    return this.httpService.post(url, data, headers).pipe(
+      map((response: any) => response.data),
+      catchError((error) => {
+        console.error(error);
+        return throwError(() => error);
+      }),
+    );
   }
 
   //axios way

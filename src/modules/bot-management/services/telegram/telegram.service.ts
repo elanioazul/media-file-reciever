@@ -3,6 +3,7 @@ import { AxioshttpService } from 'src/modules/providers/services/http/axioshttp/
 import { BotMessage } from '../../interfaces/bot-message.interface';
 import { Observable } from 'rxjs';
 import { AxiosResponse } from 'axios';
+import * as FormData from 'form-data';
 
 const sendMessageApiMethod = '/sendMessage';
 const sendPhotoApiMethod = '/sendPhoto';
@@ -11,6 +12,8 @@ const sendDocumentApiMethod = '/sendDocument';
 const telegramBotsUrl = 'https://api.telegram.org/bot';
 const myToken = process.env.BOT_TOKEN;
 const BASE_URL = telegramBotsUrl + myToken;
+
+const formHeaders = { 'Content-Type': 'multipart/form-data' };
 
 @Injectable()
 export class TelegramService {
@@ -51,5 +54,55 @@ export class TelegramService {
       //send back the same message to bot user
       return this.sendMessage(message, sendMessageApiMethod, messagetext);
     }
+  }
+
+  manageFile(
+    ownerTelegramUser: string,
+    file: Express.Multer.File,
+  ): Observable<AxiosResponse<BotMessage>> {
+    const formData = new FormData();
+    const chatId = ownerTelegramUser;
+
+    formData.append('chat_id', chatId);
+    formData.append('caption', file.originalname);
+
+    if (file.mimetype.startsWith('video')) {
+      return this.handleVideo(formData, file);
+    } else if (file.mimetype.startsWith('image')) {
+      return this.handlePhoto(formData, file);
+    } else {
+      throw new Error('Unsupported file type');
+    }
+  }
+
+  handlePhoto(formData: FormData, file: Express.Multer.File): Observable<any> {
+    formData.append('photo', file.buffer, {
+      filename: file.originalname,
+      contentType: file.mimetype,
+    });
+
+    return this.axiosService.doNestAxiosPost(
+      BASE_URL,
+      sendPhotoApiMethod,
+      formData,
+      {
+        headers: formHeaders,
+      },
+    );
+  }
+  handleVideo(formData: FormData, file: Express.Multer.File): Observable<any> {
+    formData.append('document', file.buffer, {
+      filename: file.originalname,
+      contentType: file.mimetype,
+    });
+
+    return this.axiosService.doNestAxiosPost(
+      BASE_URL,
+      sendDocumentApiMethod,
+      formData,
+      {
+        headers: formHeaders,
+      },
+    );
   }
 }
