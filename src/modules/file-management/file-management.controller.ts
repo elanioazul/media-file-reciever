@@ -118,7 +118,12 @@ export class FileManagementController {
     );
 
     this.telegramService
-      .manageFile(storageObjDto.ownerTelegramUser, file)
+      .manageFile(
+        storageObjDto.ownerTelegramUser,
+        createdTreecamFile.mimetype,
+        createdTreecamFile.originalname,
+        createdTreecamFile.path,
+      )
       .subscribe((data) => {
         console.log(data);
       });

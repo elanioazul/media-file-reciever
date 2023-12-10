@@ -30,12 +30,12 @@ export class AxioshttpService {
   doNestAxiosPost(
     baseUrl: string,
     endpoint: string,
-    data: FormData,
+    params: any,
     headers: any,
   ): Observable<any> {
     const url = baseUrl + endpoint;
 
-    return this.httpService.post(url, data, headers).pipe(
+    return this.httpService.post(url, params, headers).pipe(
       map((response: any) => response.data),
       catchError((error) => {
         console.error(error);

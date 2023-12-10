@@ -3,7 +3,6 @@ import { AxioshttpService } from 'src/modules/providers/services/http/axioshttp/
 import { BotMessage } from '../../interfaces/bot-message.interface';
 import { Observable } from 'rxjs';
 import { AxiosResponse } from 'axios';
-import * as FormData from 'form-data';
 
 const sendMessageApiMethod = '/sendMessage';
 const sendPhotoApiMethod = '/sendPhoto';
@@ -14,6 +13,9 @@ const myToken = process.env.BOT_TOKEN;
 const BASE_URL = telegramBotsUrl + myToken;
 
 const formHeaders = { 'Content-Type': 'multipart/form-data' };
+const regularHeaders = { 'Content-Type': 'application/json' };
+
+const ngrokUrl = 'https://e46b-2-138-160-33.ngrok-free.app';
 
 @Injectable()
 export class TelegramService {
@@ -58,50 +60,46 @@ export class TelegramService {
 
   manageFile(
     ownerTelegramUser: string,
-    file: Express.Multer.File,
+    mimetype: string,
+    originalname: string,
+    path: string,
   ): Observable<AxiosResponse<BotMessage>> {
-    const formData = new FormData();
     const chatId = ownerTelegramUser;
+    const params = {
+      chat_id: chatId,
+      caption: originalname,
+    };
 
-    formData.append('chat_id', chatId);
-    formData.append('caption', file.originalname);
-
-    if (file.mimetype.startsWith('video')) {
-      return this.handleVideo(formData, file);
-    } else if (file.mimetype.startsWith('image')) {
-      return this.handlePhoto(formData, file);
+    if (mimetype.startsWith('video')) {
+      return this.handleVideo(params, path);
+    } else if (mimetype.startsWith('image')) {
+      return this.handlePhoto(params, path);
     } else {
       throw new Error('Unsupported file type');
     }
   }
 
-  handlePhoto(formData: FormData, file: Express.Multer.File): Observable<any> {
-    formData.append('photo', file.buffer, {
-      filename: file.originalname,
-      contentType: file.mimetype,
-    });
+  handlePhoto(params: any, path: string): Observable<any> {
+    params['photo'] = ngrokUrl + '/' + path;
 
     return this.axiosService.doNestAxiosPost(
       BASE_URL,
       sendPhotoApiMethod,
-      formData,
+      params,
       {
-        headers: formHeaders,
+        headers: regularHeaders,
       },
     );
   }
-  handleVideo(formData: FormData, file: Express.Multer.File): Observable<any> {
-    formData.append('document', file.buffer, {
-      filename: file.originalname,
-      contentType: file.mimetype,
-    });
+  handleVideo(params: any, path: string): Observable<any> {
+    params['document'] = ngrokUrl + '/' + path;
 
     return this.axiosService.doNestAxiosPost(
       BASE_URL,
       sendDocumentApiMethod,
-      formData,
+      params,
       {
-        headers: formHeaders,
+        headers: regularHeaders,
       },
     );
   }
