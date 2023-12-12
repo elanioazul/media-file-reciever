@@ -12,10 +12,13 @@ const telegramBotsUrl = 'https://api.telegram.org/bot';
 const myToken = process.env.BOT_TOKEN;
 const BASE_URL = telegramBotsUrl + myToken;
 
-const formHeaders = { 'Content-Type': 'multipart/form-data' };
+const CHAT_ID = process.env.CHAT_ID;
+
+const filesFileEndpoint = '/api/files/file/';
+
 const regularHeaders = { 'Content-Type': 'application/json' };
 
-const ngrokUrl = 'https://e46b-2-138-160-33.ngrok-free.app';
+const ngrokUrl = 'https://f443-2-138-160-33.ngrok-free.app';
 
 @Injectable()
 export class TelegramService {
@@ -59,28 +62,27 @@ export class TelegramService {
   }
 
   manageFile(
-    ownerTelegramUser: string,
     mimetype: string,
     originalname: string,
-    path: string,
+    fileName: string,
   ): Observable<AxiosResponse<BotMessage>> {
-    const chatId = ownerTelegramUser;
+    const chatId = CHAT_ID;
     const params = {
       chat_id: chatId,
       caption: originalname,
     };
 
     if (mimetype.startsWith('video')) {
-      return this.handleVideo(params, path);
+      return this.handleVideo(params, fileName);
     } else if (mimetype.startsWith('image')) {
-      return this.handlePhoto(params, path);
+      return this.handlePhoto(params, fileName);
     } else {
       throw new Error('Unsupported file type');
     }
   }
 
-  handlePhoto(params: any, path: string): Observable<any> {
-    params['photo'] = ngrokUrl + '/' + path;
+  handlePhoto(params: any, fileName: string): Observable<any> {
+    params['photo'] = ngrokUrl + filesFileEndpoint + fileName;
 
     return this.axiosService.doNestAxiosPost(
       BASE_URL,
@@ -91,8 +93,8 @@ export class TelegramService {
       },
     );
   }
-  handleVideo(params: any, path: string): Observable<any> {
-    params['document'] = ngrokUrl + '/' + path;
+  handleVideo(params: any, fileName: string): Observable<any> {
+    params['document'] = ngrokUrl + filesFileEndpoint + fileName;
 
     return this.axiosService.doNestAxiosPost(
       BASE_URL,
