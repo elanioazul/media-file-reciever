@@ -16,9 +16,13 @@ import { Multer, diskStorage } from 'multer';
 import * as path from 'path';
 import { TreeCamFiletDto } from './dto/treecam-file.dto';
 import { CreateTreeCamFileResponse } from './classes/creation-response';
+import { TelegramService } from '../bot-management/services/telegram/telegram.service';
 @Controller('api/files')
 export class FileManagementController {
-  constructor(private readonly fileManagementService: FileManagementService) {}
+  constructor(
+    private readonly fileManagementService: FileManagementService,
+    private readonly telegramService: TelegramService,
+  ) {}
 
   // @Post('/multiple')
   // @UseInterceptors(FilesInterceptor('files'))
@@ -98,6 +102,9 @@ export class FileManagementController {
           callback(null, customFileName);
         },
       }),
+      limits: {
+        fileSize: 1024 * 1024 * 10, // Set a reasonable limit, for example, 10 MB
+      },
     }),
   )
   async upload(
@@ -109,6 +116,16 @@ export class FileManagementController {
       storageObjDto,
       file,
     );
+
+    this.telegramService
+      .manageFile(
+        createdTreecamFile.mimetype,
+        createdTreecamFile.originalname,
+        createdTreecamFile.filename,
+      )
+      .subscribe((data) => {
+        console.log(data);
+      });
 
     return new CreateTreeCamFileResponse(
       'TreeCamFile created successfully',
