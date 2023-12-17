@@ -1,8 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { AxioshttpService } from 'src/modules/providers/services/http/axioshttp/axioshttp.service';
-import { BotMessage } from '../../interfaces/bot-message.interface';
-import { Observable } from 'rxjs';
+import { BotMessage, Chat } from '../../interfaces/bot-message.interface';
+import { Observable, catchError, from, of, switchMap, throwError } from 'rxjs';
 import { AxiosResponse } from 'axios';
+import { InjectRepository } from '@nestjs/typeorm';
+import { TelegramAccount } from '../../entities/telegram-account';
+import { Repository } from 'typeorm';
+import { ITelegramAccount } from '../../interfaces/telegram-account.interfaz';
 
 const sendMessageApiMethod = '/sendMessage';
 const sendPhotoApiMethod = '/sendPhoto';
@@ -22,7 +26,11 @@ const ngrokUrl = 'https://f443-2-138-160-33.ngrok-free.app';
 
 @Injectable()
 export class TelegramService {
-  constructor(private axiosService: AxioshttpService) {}
+  constructor(
+    private axiosService: AxioshttpService,
+    @InjectRepository(TelegramAccount)
+    private readonly telegramRepository: Repository<TelegramAccount>,
+  ) {}
 
   public sendMessage(
     origenMessage: BotMessage,
@@ -41,11 +49,47 @@ export class TelegramService {
     if (messagetext.charAt(0) == '/') {
       const command = messagetext.substring(1);
       switch (command) {
-        case 'start':
+        case 'registration':
+          return this.handleRegistration(message.message.chat).pipe(
+            switchMap((telegramAccount: ITelegramAccount) => {
+              if (telegramAccount.isNewlyCreated) {
+                return this.sendMessage(
+                  message,
+                  sendMessageApiMethod,
+                  'Registration success',
+                );
+              } else {
+                return this.sendMessage(
+                  message,
+                  sendMessageApiMethod,
+                  'You are already a registered user',
+                );
+              }
+            }),
+          );
+
+        case 'mycameras':
           return this.sendMessage(
             message,
             sendMessageApiMethod,
-            'I can help you out how to start',
+            'Info related to your cameras is not implemented yet',
+          );
+
+        case 'ranking':
+          return this.sendMessage(
+            message,
+            sendMessageApiMethod,
+            'Accounting of files managed by the app is not implemented yet',
+          );
+
+        case 'help':
+          return this.sendMessage(
+            message,
+            sendMessageApiMethod,
+            `
+            This is a bot about your treecams.\n
+            Type predefined commands to interact
+            `,
           );
 
         default:
@@ -103,6 +147,41 @@ export class TelegramService {
       {
         headers: regularHeaders,
       },
+    );
+  }
+
+  private handleRegistration(userChat: Chat): Observable<TelegramAccount> {
+    return from(
+      this.telegramRepository.findOne({
+        // where: [
+        //   { chat_id: userChat.id },
+        //   { username: userChat.username },
+        //   { first_name: userChat.first_name },
+        // ],
+        where: { username: userChat.username },
+      }),
+    ).pipe(
+      switchMap((existingAccount) => {
+        if (existingAccount) {
+          return of({ ...existingAccount, isNewlyCreated: false });
+        }
+
+        const newAccount = this.telegramRepository.create({
+          chat_id: userChat.id.toString(),
+          username: userChat.username,
+          first_name: userChat.first_name,
+          last_name: userChat.last_name,
+          type: 'private',
+        });
+
+        return from(this.telegramRepository.save(newAccount)).pipe(
+          catchError((error) => {
+            return throwError(() => error);
+          }),
+          switchMap(() => of({ ...newAccount, isNewlyCreated: true })),
+        );
+      }),
+      catchError((error) => throwError(() => error)),
     );
   }
 }

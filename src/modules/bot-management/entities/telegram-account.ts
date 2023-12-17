@@ -6,7 +6,7 @@ export class TelegramAccount {
   id: number;
 
   @Column({ nullable: true })
-  chat_id: number;
+  chat_id: string;
 
   @Column({ nullable: true })
   username: string;
