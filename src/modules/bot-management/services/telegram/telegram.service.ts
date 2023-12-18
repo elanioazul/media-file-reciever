@@ -54,13 +54,13 @@ export class TelegramService {
                 return this.sendMessage(
                   message,
                   sendMessageApiMethod,
-                  'Registration success',
+                  'Registro realizado con éxito',
                 );
               } else {
                 return this.sendMessage(
                   message,
                   sendMessageApiMethod,
-                  'You are already a registered user',
+                  'Eres ya un usuario registrado',
                 );
               }
             }),
@@ -70,14 +70,14 @@ export class TelegramService {
           return this.sendMessage(
             message,
             sendMessageApiMethod,
-            'Info related to your cameras is not implemented yet',
+            'Información a cerca de sus cámaras sin implementar todavía',
           );
 
         case 'ranking':
           return this.sendMessage(
             message,
             sendMessageApiMethod,
-            'Accounting of files managed by the app is not implemented yet',
+            'Contabilidad de files gestionados por la app no implementada todavía',
           );
 
         case 'help':
@@ -85,7 +85,7 @@ export class TelegramService {
             message,
             sendMessageApiMethod,
             `
-            This is a bot about your treecams. Type predefined commands to interact.
+            Esto es un bot sobre stand-tree cameras. Escribe alguno de los comandos disponibles.
             `,
           );
 
@@ -93,7 +93,7 @@ export class TelegramService {
           return this.sendMessage(
             message,
             sendMessageApiMethod,
-            'I don´t now that commnad',
+            'Desconozco ese comando',
           );
       }
     } else {
