@@ -4,9 +4,11 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Camera } from './camera.entity';
+import { TelegramAccount } from 'src/modules/bot-management/entities/telegram-account';
 
 @Entity('cameraowners')
 export class Owner {
@@ -22,8 +24,9 @@ export class Owner {
   @Column()
   dni: string;
 
-  @Column()
-  telegram_user: string;
+  @OneToOne(() => TelegramAccount)
+  @JoinColumn({ name: 'telegramaccount_id' })
+  telegram: TelegramAccount;
 
   @Column()
   email: string;

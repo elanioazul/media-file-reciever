@@ -9,7 +9,7 @@ interface Message {
   date: number;
   text: string;
 }
-interface Chat {
+export interface Chat {
   id: number;
   first_name: string;
   last_name: string;
