@@ -19,10 +19,7 @@ import { CreateTreeCamFileResponse } from './classes/creation-response';
 import { TelegramService } from '../bot-management/services/telegram/telegram.service';
 @Controller('api/files')
 export class FileManagementController {
-  constructor(
-    private readonly fileManagementService: FileManagementService,
-    private readonly telegramService: TelegramService,
-  ) {}
+  constructor(private readonly fileManagementService: FileManagementService) {}
 
   // @Post('/multiple')
   // @UseInterceptors(FilesInterceptor('files'))
@@ -116,16 +113,6 @@ export class FileManagementController {
       storageObjDto,
       file,
     );
-
-    this.telegramService
-      .manageFile(
-        createdTreecamFile.mimetype,
-        createdTreecamFile.originalname,
-        createdTreecamFile.filename,
-      )
-      .subscribe((data) => {
-        console.log(data);
-      });
 
     return new CreateTreeCamFileResponse(
       'TreeCamFile created successfully',

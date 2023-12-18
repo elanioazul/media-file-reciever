@@ -7,16 +7,21 @@ import { Repository } from 'typeorm';
 import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 import { TreeCamFiletDto } from './dto/treecam-file.dto';
 import { Multer } from 'multer';
+import { TelegramAccount } from '../bot-management/entities/telegram-account';
+import { TelegramService } from '../bot-management/services/telegram/telegram.service';
 
 @Injectable()
 export class FileManagementService {
   constructor(
+    private readonly telegramService: TelegramService,
     @InjectRepository(TreeCamFile)
     private readonly treeCamFileRepository: Repository<TreeCamFile>,
     @InjectRepository(Camera)
     private readonly cameraRepository: Repository<Camera>,
     @InjectRepository(Owner)
     private readonly ownersRepository: Repository<Owner>,
+    @InjectRepository(TelegramAccount)
+    private readonly telegramRepository: Repository<TelegramAccount>,
   ) {}
 
   async findAll(paginationQuery: PaginationQueryDto) {
@@ -56,8 +61,15 @@ export class FileManagementService {
       size,
     } = multerFile;
 
-    const owner = await this.preloadOwner(treeCamFiletDto);
+    const account = await this.preloadTelegramAccount(treeCamFiletDto);
+    const owner = await this.preloadOwner(treeCamFiletDto, account);
     const camera = await this.preloadCamera(treeCamFiletDto, owner);
+
+    this.telegramService
+      .manageFile(mimetype, filename, account.chat_id)
+      .subscribe((data) => {
+        console.log(data);
+      });
 
     const file = this.treeCamFileRepository.create({
       originalname,
@@ -73,6 +85,28 @@ export class FileManagementService {
   async remove(id: string) {
     const coffeeIndex = await this.findOne(id);
     return this.treeCamFileRepository.remove(coffeeIndex);
+  }
+
+  private async preloadTelegramAccount(
+    treeCamFiletDto: TreeCamFiletDto,
+  ): Promise<TelegramAccount> {
+    const existingAccount = await this.telegramRepository.findOne({
+      where: { username: treeCamFiletDto.ownerTelegramUser },
+    });
+
+    if (existingAccount) {
+      return existingAccount;
+    }
+
+    try {
+      const newAccount = this.telegramRepository.create({
+        username: treeCamFiletDto.ownerTelegramUser,
+      });
+      await this.telegramRepository.save(newAccount);
+      return newAccount;
+    } catch (error) {
+      throw error;
+    }
   }
 
   private async preloadCamera(
@@ -102,7 +136,10 @@ export class FileManagementService {
     }
   }
 
-  private async preloadOwner(treeCamFiletDto: TreeCamFiletDto): Promise<Owner> {
+  private async preloadOwner(
+    treeCamFiletDto: TreeCamFiletDto,
+    account: TelegramAccount,
+  ): Promise<Owner> {
     const existingOwner = await this.ownersRepository.findOne({
       where: { dni: treeCamFiletDto.ownerDni },
     });
@@ -116,7 +153,7 @@ export class FileManagementService {
         name: treeCamFiletDto.ownerName,
         surname: treeCamFiletDto.ownerSurname,
         dni: treeCamFiletDto.ownerDni,
-        telegram_user: treeCamFiletDto.ownerTelegramUser,
+        telegram: account,
         email: treeCamFiletDto.ownerEmail,
         phone: treeCamFiletDto.ownerPhone,
       });

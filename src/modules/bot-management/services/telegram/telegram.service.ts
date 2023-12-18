@@ -16,13 +16,11 @@ const telegramBotsUrl = 'https://api.telegram.org/bot';
 const myToken = process.env.BOT_TOKEN;
 const BASE_URL = telegramBotsUrl + myToken;
 
-const CHAT_ID = process.env.CHAT_ID;
-
 const filesFileEndpoint = '/api/files/file/';
 
 const regularHeaders = { 'Content-Type': 'application/json' };
 
-const ngrokUrl = 'https://f443-2-138-160-33.ngrok-free.app';
+const ngrokUrl = 'https://0437-213-27-229-66.ngrok-free.app';
 
 @Injectable()
 export class TelegramService {
@@ -87,8 +85,7 @@ export class TelegramService {
             message,
             sendMessageApiMethod,
             `
-            This is a bot about your treecams.\n
-            Type predefined commands to interact
+            This is a bot about your treecams. Type predefined commands to interact.
             `,
           );
 
@@ -107,13 +104,12 @@ export class TelegramService {
 
   manageFile(
     mimetype: string,
-    originalname: string,
     fileName: string,
+    chatId: string,
   ): Observable<AxiosResponse<BotMessage>> {
-    const chatId = CHAT_ID;
     const params = {
       chat_id: chatId,
-      caption: originalname,
+      caption: fileName,
     };
 
     if (mimetype.startsWith('video')) {
