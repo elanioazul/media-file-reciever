@@ -7,7 +7,9 @@ import {
   Req,
   Get,
   Param,
+  HttpStatus,
   Res,
+  HttpException,
 } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { FileManagementService } from './file-management.service';
@@ -46,8 +48,8 @@ export class FileManagementController {
     const dirname = path.resolve();
     if (!dirname) {
       return res
-        .status(500)
-        .send('Unable to determine the current working directory.');
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .send('Unable to determine the directory for the file requested');
     }
     try {
       const found = await this.fileManagementService.findOne(id);
@@ -55,7 +57,17 @@ export class FileManagementController {
       res.sendFile(physicalFilePath);
       res.contentType(found.mimetype);
     } catch (error) {
-      res.status(404).send('File not found');
+      if (error.name === 'EntityNotFoundException') {
+        return res.status(HttpStatus.NOT_FOUND).send('File not found');
+      }
+
+      // Log other types of errors for debugging purposes
+      console.error(error);
+
+      // Generic error response
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .send('Failed to process the file requested. Please try again later.');
     }
   }
 
@@ -109,14 +121,25 @@ export class FileManagementController {
     @Req() req: Request,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    const createdTreecamFile = await this.fileManagementService.create(
-      storageObjDto,
-      file,
-    );
+    try {
+      const createdTreecamFile = await this.fileManagementService.create(
+        storageObjDto,
+        file,
+      );
 
-    return new CreateTreeCamFileResponse(
-      'TreeCamFile created successfully',
-      createdTreecamFile,
-    );
+      return new CreateTreeCamFileResponse(
+        'TreeCamFile created successfully',
+        createdTreecamFile,
+      );
+    } catch (error) {
+      console.error(error);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Internal Server Error uploading file',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }

@@ -20,7 +20,7 @@ const filesFileEndpoint = '/api/files/file/';
 
 const regularHeaders = { 'Content-Type': 'application/json' };
 
-const ngrokUrl = 'https://0437-213-27-229-66.ngrok-free.app';
+const ngrokUrl = 'https://66ce-213-27-229-66.ngrok-free.app';
 
 @Injectable()
 export class TelegramService {
