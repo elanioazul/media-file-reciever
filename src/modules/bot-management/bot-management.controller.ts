@@ -1,8 +1,17 @@
-import { Controller, Get, Post, Req, Body, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Req,
+  Body,
+  Res,
+  HttpStatus,
+} from '@nestjs/common';
 import { TelegramService } from './services/telegram/telegram.service';
 import { Response } from 'express';
-import { catchError } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { BotMessage } from './interfaces/bot-message.interface';
+import { of } from 'rxjs';
 @Controller('api/telegram')
 export class BotManagementController {
   constructor(private telegramService: TelegramService) {}
@@ -16,18 +25,22 @@ export class BotManagementController {
       this.telegramService
         .handleMessage(body)
         .pipe(
+          // tap((data) => {
+          //   console.log('Successful processing telegram messages:', data);
+          // }),
           catchError((error) => {
-            throw `An error happened. Msg: ${JSON.stringify(
-              error?.response?.data,
-            )}`;
+            console.error('Error in handleMessage:', error);
+            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+              message: 'An error occurred while processing the message.',
+              error: error?.response?.data,
+            });
+            return of(null);
           }),
         )
-        .subscribe((data) => {
-          console.log(data);
-        });
+        .subscribe();
       return res.send().status(200);
     } catch (error) {
-      console.log(error);
+      console.error('Error outside stream:', error);
     }
   }
 }

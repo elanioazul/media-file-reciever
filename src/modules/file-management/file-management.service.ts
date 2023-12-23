@@ -9,6 +9,7 @@ import { TreeCamFiletDto } from './dto/treecam-file.dto';
 import { Multer } from 'multer';
 import { TelegramAccount } from '../bot-management/entities/telegram-account';
 import { TelegramService } from '../bot-management/services/telegram/telegram.service';
+import { catchError, tap } from 'rxjs/operators';
 
 @Injectable()
 export class FileManagementService {
@@ -67,9 +68,14 @@ export class FileManagementService {
 
     this.telegramService
       .manageFile(mimetype, filename, account.chat_id)
-      .subscribe((data) => {
-        console.log(data);
-      });
+      .pipe(
+        tap((data) => console.log('Successful managing file:', data)),
+        catchError((error) => {
+          console.error('Error managing file:', error);
+          return [];
+        }),
+      )
+      .subscribe();
 
     const file = this.treeCamFileRepository.create({
       originalname,
